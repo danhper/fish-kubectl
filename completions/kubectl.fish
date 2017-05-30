@@ -261,6 +261,10 @@ function __kubectl_subcommands -a cmd
     end
 end
 
+function __kubectl_clusters
+  kubectl config get-clusters | tail -n +2
+end
+
 # Global command-line options:
 
 complete -c kubectl -l "alsologtostderr" -d "Log to standard error as well as files"
@@ -268,8 +272,6 @@ complete -c kubectl -l "as" -d "Username to impersonate for the operation"
 complete -c kubectl -l "certificate-authority" -d "Path to a cert. file for the certificate authority"
 complete -c kubectl -l "client-certificate" -d "Path to a client certificate file for TLS"
 complete -c kubectl -l "client-key" -d "Path to a client key file for TLS"
-complete -c kubectl -l "cluster" -d "The name of the kubeconfig cluster to use"
-complete -c kubectl -l "context" -d "The name of the kubeconfig context to use"
 complete -c kubectl -l "insecure-skip-tls-verify" -d "Certificate will not be checked for validity"
 complete -c kubectl -l "kubeconfig" -d "Path to the kubeconfig file to use for CLI requests"
 complete -c kubectl -l "log-backtrace-at" -d "Emit a stack trace when logging hits line file:N"
@@ -289,6 +291,8 @@ complete -c kubectl -s v -l "v" -d "Log level for V logs"
 complete -c kubectl -l "vmodule" -d "List of settings for file-filtered logging"
 
 complete -c kubectl -f -n "__kubectl_using_option -n --namespace" -a "(__kubectl_resources --no-prefix namespaces)" -d "Namespace"
+complete -c kubectl -f -l "context" -a "(__kubectl_clusters)" -d "The name of the kubeconfig context to use"
+complete -c kubectl -f -l "cluster" -a "(__kubectl_clusters)" -d "The name of the kubeconfig cluster to use"
 
 # Basic Commands (Beginner):
 
