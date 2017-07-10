@@ -23,6 +23,14 @@ function __kubectl_using_command
     return 1
 end
 
+function __kubectl_command_namespace -a cmd
+    set namespace (string replace -r '^kubectl .*(-n |--namespace[= ]?)([^ ]*) .*$' '$2' -- $cmd)
+    if test $status -eq 1
+        set namespace "default"
+    end
+    echo $namespace
+end
+
 function __kubectl_using_option
     set cmd (commandline -poc)
     set query "("(string join -- "|" $argv)")"
@@ -65,7 +73,7 @@ end
 
 function __kubectl_no_pod
     set cmd (commandline -pc)
-    for i in (__kubectl_pods --no-prefix pods)
+    for i in (__kubectl_resources --no-prefix pods)
         if string match -q "*$i*" -- $cmd
             return 1
         end
@@ -178,7 +186,7 @@ function __kubectl_resources
     end
 
     set cmd (commandline -pc)
-    set namespace (string replace -r '^kubectl .*(-n |--namespace[= ]?)([^ ]*) .*$' '$2' -- $cmd)
+    set namespace (__kubectl_command_namespace $cmd)
 
     for resource in $argv
         if set -lq prefix
@@ -190,7 +198,7 @@ function __kubectl_resources
 end
 
 function __kubectl_containers
-    set namespace (string replace -r '^kubectl .*(-n |--namespace[= ]?)([^ ]*) .*$' '$2' -- $argv)
+    set namespace (__kubectl_command_namespace $cmd)
     set pod
 
     for i in (__kubectl_resources --no-prefix pods)
@@ -209,8 +217,7 @@ end
 
 function __kubectl_pods_completion
     set cmd (commandline -pc)
-    set namespace (string replace -r '^kubectl .*(-n |--namespace[= ]?)([^ ]*) .*$' '$2' -- $cmd)
-
+    set namespace (__kubectl_command_namespace $cmd)
     kubectl get pods -n "$namespace" ^/dev/null | tail -n +2 | awk '{print $1"\tPod "$2" "$3}'
 end
 
