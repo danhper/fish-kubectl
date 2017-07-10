@@ -64,6 +64,9 @@ end
 function __kubectl_using_resource_type
     for rt in (__kubectl_resource_types)
         if __fish_seen_subcommand_from $rt
+            if contains  -- --show $argv
+                echo $rt
+            end
             return 0
         end
     end
@@ -593,15 +596,15 @@ complete -c kubectl -f -n "__kubectl_no_command" -a version -d "Print the client
 complete -c kubectl -f -n "__kubectl_no_command" -a options -d "Print the shared options"
 
 # Attach
-complete -c kubectl -n "__kubectl_using_command attach" -a "(__kubectl_pods_completion)"
+complete -c kubectl -f -n "__kubectl_using_command attach" -a "(__kubectl_pods_completion)"
 
 # Exec
-complete -c kubectl -n "__kubectl_using_command exec" -a "(__kubectl_pods_completion)"
+complete -c kubectl -f -n "__kubectl_using_command exec" -a "(__kubectl_pods_completion)"
 
 # Describe
-complete -c kubectl -n "__kubectl_using_command describe" -a "(__kubectl_resource_types)" -d "Resource Type"
-complete -c kubectl -n "__kubectl_using_command describe" -a "(__kubectl_pods_completion)"
+complete -c kubectl -f -n "__kubectl_using_command describe; and not __kubectl_using_resource_type" -a "(__kubectl_resource_types)" -d "Resource Type"
+complete -c kubectl -f -n "__kubectl_using_command describe; and __kubectl_using_resource_type" -a "(__kubectl_resources (__kubectl_using_resource_type --show)  --no-prefix)"
 
 # Logs
-complete -f -c kubectl -n "__kubectl_using_command logs; and __kubectl_no_pod" -a "(__kubectl_pods_completion)"
-complete -f -c kubectl -n "__kubectl_using_command logs" -a "(__kubectl_containers (commandline -c))" -d "Container"
+complete -c kubectl -f -n "__kubectl_using_command logs; and __kubectl_no_pod" -a "(__kubectl_pods_completion)"
+complete -c kubectl -f -n "__kubectl_using_command logs" -a "(__kubectl_containers (commandline -c))" -d "Container"
